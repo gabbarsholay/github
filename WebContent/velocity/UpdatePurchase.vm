@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta content="Boks - 0.5.8" name="generator"/>
+<title>Help2Decide</title>
+<!-- Framework CSS -->
+<link rel="stylesheet" href="../resources/css/screen.css"
+	type="text/css" media="screen, projection" />
+<link rel="stylesheet" href="../resources/css/custom.css"
+	type="text/css" media="screen, projection" />
+<link rel="stylesheet" href="../resources/themes/cupertino/jquery-ui-1.8.23.custom.css"
+	type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="../resources/themes/cupertino/jquery.ui.all.css"
+	type="text/css" media="screen, projection" />
+<link rel="stylesheet" href="../resources/css/print.css" type="text/css"
+	media="print" />
+	<link rel="stylesheet" href="../resources/css/h2d.css" type="text/css" media="screen, projection"/>
+<!--[if lt IE 8]><link rel="stylesheet" href="css/ie.css" type="text/css" media="screen, projection"/><![endif]-->
+
+<!--
+  jQuery library
+-->
+<script type="text/javascript"
+	src="../resources/lib/jquery-1.8.0.js"></script>
+<script type="text/javascript"
+	src="../resources/lib/ui/jquery.ui.core.js"></script>
+<script type="text/javascript"
+	src="../resources/lib/ui/jquery.ui.widget.js"></script>
+	<script type="text/javascript"
+	src="../resources/lib/ui/jquery.ui.datepicker.js"></script>
+	<script type="text/javascript" src="../resources/lib/ui/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="../resources/lib/ui/jquery.ui.position.js"></script>
+	<script type="text/javascript" src="../resources/lib/ui/jquery.ui.autocomplete.js"></script>
+	<script type="text/javascript"
+	src="http://jzaefferer.github.com/jquery-validation/jquery.validate.js"></script>
+ <script type="text/javascript" src="../resources/lib/jquery-1.4.2.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../resources/skins/tango/skin.css" />
+
+<style type="text/css">
+
+
+label.error { float: none; color: red; padding-left: .5em; vertical-align: top;  background: none
+    border-color: green;}
+	<style>
+	
+	.ui-autocomplete-loading { background: white url('../resources/images/ui-anim_basic_16x16.gif') right center no-repeat; }
+	 
+	</style>
+
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+  
+
+	  	//radd report abuse popup script
+	     $(".repabuse_linkon").click(function(){
+		 var obj = $("#deal_form").serializeObject();
+var dealnumber= obj.selectDeal;
+	if (!$("input[name='selectDeal']:checked").val()) { 
+	         alert('Please select deal to report an issue');
+	             
+	       return false;     
+	   }     
+	   else {  
+	      $("#rep_abs").fadeIn();
+		  }
+	    });
+	     $(".repabuse_linkoff").click(function(){
+	      $("#rep_abs").fadeOut();
+	  });
+
+});
+
+</script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".dropdown dt a").click(function() {
+
+		        // Change the behaviour of onclick states for links within the menu.
+			var toggleId = "#" + this.id.replace(/^link/,"ul");
+
+		        // Hides all other menus depending on JQuery id assigned to them
+			$(".dropdown dd ul").not(toggleId).hide();
+
+		        //Only toggles the menu we want since the menu could be showing and we want to hide it.
+			$(toggleId).toggle();
+
+		        //Change the css class on the menu header to show the selected class.
+			if($(toggleId).css("display") == "none"){
+				$(this).removeClass("selected");
+			}else{
+				$(this).addClass("selected");
+			}
+
+		});
+
+		$(".dropdown dd ul li a").click(function() {
+
+		    // This is the default behaviour for all links within the menus
+		    var text = $(this).html();
+		    $(".dropdown dt a span").html(text);
+		    $(".dropdown dd ul").hide();
+		});
+
+		$(document).bind('click', function(e) {
+
+		    // Lets hide the menu when the page is clicked anywhere but the menu.
+		    var $clicked = $(e.target);
+		    if (! $clicked.parents().hasClass("dropdown")){
+		        $(".dropdown dd ul").hide();
+				$(".dropdown dt a").removeClass("selected");
+			}
+
+		});
+	});
+	
+ $(document).ready(function(){ 
+	$(".contact_linkon").click(function(){
+	
+	var obj = $("#deal_form").serializeObject();
+	       //  alert(JSON.stringify(obj)); 
+var dealnumber= obj.selectDeal;
+//alert(dealnumber);
+
+	 if (!$("input[name='selectDeal']:checked").val()) { 
+	         alert('Please select deal to contact the seller');
+	             
+	       return false;     
+	   }     
+	   else {  
+	$.ajax({ 
+  type: "GET", 
+  url: "/decision_hub/mvc/searchseller?deal="+dealnumber, 
+  success: function(html){
+  //alert( html.status);
+      $(".fname").html(html.user.first_NAME);
+	  $(".lname").html(html.user.last_NAME);
+	  $(".email").html(html.user.email_ID);
+	  $(".cnumber").html(html.user.contact_NUMBER);
+         $("#contact_seller").fadeIn();
+	     $(".contactseller_linkoff").click(function(){
+	      $("#contact_seller").fadeOut();
+	  });
+  //$("#cat").html(html.status);
+  },
+  error:function(html)
+  {
+  
+  },
+ 	}) 
+ // alert( "Data Saved: " ); 
+
+	 //  alert ('$( '#selectDeal option:selected' ).text( ));
+  	//   alert('One of the radio buttons is checked!'); 
+ }	    
+	});
+});
+
+$.fn.serializeObject = function()
+    {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+    };
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+$(".redirecttopastpur_linkon").click(function(){
+var obj = $("#deal_form").serializeObject();
+
+alert(JSON.stringify(obj));
+  var dealnumber= obj.selectDeal;
+	if (!$("input[name='selectDeal']:checked").val()) { 
+	         alert('Please select deal to complete the purchase');
+	             
+	       return false;     
+	   }     
+	   else { 
+$("#deal_form").submit();	   
+	/*$.ajax({ 
+  type: "GET", 
+  url: "/decision_hub/mvc/redirecttopastpur?deal="+dealnumber, 
+  /*success: function(html){
+  window.location = '../velocity/createproject.vm';
+  return false;
+},
+error:function(html)
+  {
+  
+  },*/
+	//this.document.location.href='createproject';
+	//}) 
+  }
+});
+});
+
+$.fn.serializeObject = function()
+    {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+    };
+$(document).ready(function(){
+$(".repabuse_link").click(function(){
+
+var obj = $("#repabuse_form").serializeObject();
+	       //  alert(JSON.stringify(obj)); 
+var reasoncode= obj.reasoncd;
+var obj2 = $("#deal_form").serializeObject();
+var dealnumber= obj2.selectDeal;
+//alert(dealnumber);
+
+	 if (!$("input[name='reasoncd']:checked").val()) { 
+	         alert('Please select reason for the issue');
+	             
+	       return false;     
+	   }     
+	   else {
+	   
+	   $.ajax({ 
+  type: "GET", 
+  url: "/decision_hub/mvc/abuseupdate?reasoncd="+reasoncode+"&"+"deal="+dealnumber,
+ 
+	   success: function(html){
+	   
+	   alert('issue has been reported');
+	   },
+	   error:function(html)
+  {  
+  },
+  })
+  }
+  });
+  });
+
+</script>
+
+</head>
+<body>
+
+<!-- <form>-->
+
+
+<div class="container">
+  <div class="span-25 last" id="container">
+    <div class="span-25 last" id="mainarea">
+
+    <!---round -->
+    <div class="box blue">
+	<div class="corner TL"></div>
+	<div class="corner TR"></div>
+	<div class="corner BL"></div>
+	<div class="corner BR"></div>
+	<div>
+     <!---round -->
+    <div class="box red">
+	<div class="corner_white TL"></div>
+	<div class="corner_white TR"></div>
+	<div class="corner_white BL"></div>
+	<div class="corner_white BR"></div>
+	<table><tr><td style="padding:0px;"><div class="span-23 last" id="header">
+            #include("velocity/template/logo.html")
+            <div class="span-1"></div>
+            <div class="span-18 last" id="menuall">
+
+            <div id="quicklinks">
+            <div style="position:relative; float:right; margin-left:10px; right:0px; z-index:3000;">
+			   #parse("velocity/template/logout.vm")
+			</div><div style="position:relative; float:right;">Welcome $whoami.getFirstName() $whoami.getLastName()</div>
+
+
+
+</div>
+           #parse("velocity/template/menuall.vm")
+
+
+
+            </div>
+            </div>
+            <div class="span-24 last bnr_adj prepend-top" id="banner" style="min-height:200px;">
+            <!-- left panel -->
+ <div class="span-23" id="grid_style1" style="margin-left:5px;">
+  <div class="form_title"><h1>Update Purchase<br /><span>Here you close the deal</span></h1></div>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <th></th>
+    <th>Deal#</th>
+    <th>My Shopper #</th>
+    <th>Category</th>
+    <th>My Comments</th>
+    <th>Seller Name</th>
+    <th>Final Price by Seller</th>
+    <th>Final Social Bonus - Shopper</th>
+    <th>Final Social Bonus - Advisor</th>
+    <th>Brand Bought</th>
+    <th>Model Bought</th>
+    <th>Final Comments by Seller</th>
+  </tr>
+  <form id="deal_form" action="redirecttopastpur">
+  <tr>#foreach($i in $message)
+    <td  class=""><input id="$i" type="radio" name="selectDeal" value="$i.DEAL_NUMBER"/></td>
+    <input id="$i" type="hidden" name="dealnumber" value="$i.DEAL_NUMBER" />
+    <td class="">$i.DEAL_NUMBER</td>
+    <td class="">$i.BUYER_CODE</td>
+    <td class="">$i.CATEGORY_NAME</td>
+    <td class="">$i.COMMENTS</td>
+    <td class="">$i.FIRST_NAME</td>
+    <td class="">$i.PRICE</td>    
+    <td class="">$i.SOCIAL_BONUS_SHOPPER</td>
+    <td class="">$i.SOCIAL_BONUS_ADVISOR</td>
+    <td class="">$i.PREFERRED_BRAND</td>
+    <td class="">$i.PREFERRED_MODEL</td>
+    <td class="">$i.SELLER_COMMENTS</td>
+    <!-- <td class="graybg"><textarea class="textarea2" onfocus="blur();">$i.COMMENTS</textarea></td>-->
+  </tr>
+  
+  #end
+  </form>
+  <tr>
+  	   <td colspan="40" style="text-align:center;">
+	      	<span class="button1">
+	  			<span>
+	  		<a href="#" class="contact_linkon" >
+	  				<input id="" class="form_button1" type="button" onclick="" value="Contact&nbsp;" />
+	  			</a>
+				</span>
+	  		</span>
+
+	  		<span class="button1">
+	  			<span>
+	  			<a href="#" class="redirecttopastpur_linkon">
+	  				<input id="" class="form_button1" type="button" onclick="" value="Bought&nbsp;" />
+	  			</a>
+				</span>
+	  		</span>
+
+	  		<span class="button1">
+	  			<span>
+	  			<a href="#" class="repabuse_linkon" >
+	  				<input id="" class="form_button1" type="button" onclick="" value="Report Abuse&nbsp;" />
+	  			</a>
+	  			</span>
+	  		</span>
+	</td>
+  </tr>
+   
+</table>
+
+
+
+<div id="rep_abs" class="PopupContainer">
+<div class="PopupBox" style="width:50%;">
+<div class="form_panel" style="margin:0px;">
+<div class="form_title">
+<h1>Report Abuse<a href="#" class="repabuse_linkoff float-right popup_close">Close</a></h1>
+</div>
+<br />
+            We apologize for in-convenience. Customer care center will work with you to ensure your satisfaction
+- CEO, Help2Decide
+<br />
+<br />Option # 1 Call -1800-Pro-blem
+<br />Option # 2 Submit details below
+<br /><br />
+
+<div id="grid_style"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+<form id="repabuse_form"> 
+#foreach($re in $reasoncodelist)
+  <tr>
+    <td class="title1" width="10%"><input type="checkbox" name = "reasoncd" value="$re.getREASON_CODE()" /></td>
+    <td ><div class="reason_desc">$re.getREASON_DESC()</td>
+	
+
+  </tr>
+  #end
+  <!--<tr>
+    <td class="title1"><input type="checkbox" value="2"/></td>
+   <td>Price not Honored</td>
+
+  </tr>
+  <tr>
+    <td class="title1"><input type="checkbox" value="3"/></td>
+    <td>Category not available</td>
+
+  </tr>
+  <tr>
+    <td class="title1"><input type="checkbox" value="4"/></td>
+    <td>Others - KSKF</td>
+
+  </tr>-->
+  <tr>
+    <td class="title1"></td>
+    <td><textarea class="textarea3">Please write details</textarea></td>
+
+  </tr>
+
+<tr>
+	<td colspan="2" style="text-align:center">
+		<span class="button">
+		<span>
+		<a href="#" class="repabuse_link" >
+		<input id="repabusebutton" class="form_button" type="button" onclick="" value="Report Abuse" />
+		</a>
+		</span>
+		</span>
+	</td>
+</tr>
+</form>
+</table></div>
+
+            </div>
+</div>
+</div>
+
+            <!-- right panel -->
+
+            </div>
+
+
+
+            </td></tr>
+            <tr><td>&nbsp;</td></tr>
+            </table>
+</div>
+
+    <!-- end -->
+    
+    <div id="contact_seller" class="PopupContainer">
+<div class="PopupBox" style="width:50%;">
+<div class="form_panel" style="margin:0px;">
+            <div class="form_title"><h1>Contact Seller<br />
+            <span>Contact seller using these details</span>
+		<!--	<input type="hidden" value="My Seller" id="sellid"/>
+			<input type="hidden" value="" id="pid"/>-->
+            <a href="#" class="contactseller_linkoff float-right popup_close">Close</a>
+			</h1></div>
+<div id="grid_style"><table width="100%" border="0" cellspacing="0" cellpadding="0" class="form_table">
+  <tr>
+    <td width="35%" class="txtright">First Name</td>
+    <td><div class="fname">$re.getFIRST_NAME</td>
+  </tr>
+    <tr>
+      <td width="35%" class="txtright">Last Name</td>
+      <td><div class="lname">$re.getLAST_NAME</td>
+  </tr>
+  <tr>
+    <td  class="txtright">Email Id</td>
+    <td><div class="email">$re.getEMAIL_ID</td>
+  </tr>
+  <tr>
+    <td  class="txtright">Contact Number</td>
+    <td><div class="cnumber">$re.getCONTACT_NUMBER</td>
+  </tr>
+
+</table>
+</div>
+</div>
+<div>
+    <!---- 3 services ---->
+<div class="clear span-24 last" id="webparts" style="overflow:auto; float:none; margin:0 auto;">
+
+      <div class="span-12">
+      
+
+
+      </div>
+
+      <div class="span-12 last">
+      <div class="content" style="text-align:right;"></div>
+
+      </div>
+    </div>
+    <!--- end -->
+
+
+    </div>
+</div>
+</div>
+</div>
+    <!-- end -->
+  </div>
+
+    #include("velocity/template/footer.html")
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+<h:body>
+		<ui:composition template="/templates/layout/commonLayout.xhtml">
+		<ui:define name="content">
+			#{closeSalesPage.init()}
+
+			<div class="srchform_panel">
+				<h:form id="main_form">
+				<div class="form_title">
+				<h1>Close Sales<br />
+				<span>Here you close the deal. </span></h1>
+				</div>
+				
+				<p:panel id="mainpanel" styleClass="simple_panel">
+				<p:message for="mainpanel" display="message" />
+				<f:event listener="#{closeSalesPage.checkRowSelected}" type="postValidate" />
+					<div id="grid_style">
+					<p:dataTable var="closesales" 
+						value="#{closeSalesPage.lstProjModel}" 
+						id="csTable"
+						paginator="true" rows="5"  
+                 		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                 		rowsPerPageTemplate="5,10,15"
+                 		selection="#{closeSalesPage.confirmedDealProject}"
+                 		rowKey="#{closesales.projectId}"
+                 		rendered="#{fn:length(closeSalesPage.lstConfirmedDealProjects) > 0}">
+						<p:column selectionMode="single"/>
+                 		<p:ajax event="rowSelectRadio" listener="#{closeSalesPage.onRowSelect}"   
+                    		update=":salesDoneDialog" /> 
+						<p:column headerText="Deal#">
+							<h:outputText value="#{closesales.dealNumber}" />
+						</p:column>						
+						<p:column headerText="Category">
+							<h:outputText value="#{closesales.quote.categories.categoryName}" />
+						</p:column>
+						<p:column headerText="My Seller&lt;br&gt;Code">
+							<h:outputText value="#{closesales.sellerCode}" />
+						</p:column>
+						<p:column headerText="My&lt;BR&gt;Comments">
+							<h:outputText value="#{closesales.quote.comments}" />
+						</p:column>
+						<p:column headerText="My Price">
+							<h:outputText value="#{closesales.quote.price}" />
+						</p:column>
+						<p:column headerText="Social Bonus -&lt;BR&gt;Buyer">
+							<h:outputText value="#{closesales.quote.socialBonusShopper}" />
+						</p:column>
+						<p:column
+							headerText="Social Bonus -&lt;BR&gt; Advisor">
+							<h:outputText
+								value="#{closesales.quote.socialBonusAdvisor}" />
+						</p:column>
+						<p:column headerText="My Brand" style="width:20px;">
+							<h:outputText value="#{closesales.quote.preferredBrand}" />
+						</p:column>
+						<p:column headerText="My Model"> 
+							<h:outputText value="#{closesales.quote.preferredModel}" />
+						</p:column>
+						<p:column headerText="Buyer&lt;BR&gt;Comments">
+							<h:outputText value="#{closesales.comments}" />
+						</p:column>
+					</p:dataTable>
+
+					</div>
+					<div align="center">
+					<c:choose>
+					<c:when test="#{userBean.user.userStatus != 'Fully Blocked'}">
+
+					<span class="button1 prepend-top">
+					<span> <p:commandButton styleClass="form_button1"
+						id="contactButton" ajax="true" value="Contact" process="@form"
+						actionListener="#{closeSalesPage.contactBuyer}" update="@(.ui-panel)" 
+						rendered="#{fn:length(closeSalesPage.lstConfirmedDealProjects) > 0}"/>
+					</span> </span>
+					 <span class="button1 prepend-top">
+					 <span> <p:commandButton styleClass="form_button1"
+						id="updButton" ajax="true" value="Sales Done" process="@form"
+						actionListener="#{closeSalesPage.closeSales}"
+						update="@(.ui-panel)" 
+						rendered="#{fn:length(closeSalesPage.lstConfirmedDealProjects) > 0}"/>
+					</span> </span>
+
+					</c:when>
+					</c:choose>
+
+					<span class="button1 prepend-top">
+					<span> <p:commandButton styleClass="form_button1"
+						id="repAbuseButton" ajax="true" value="Report Abuse" process="@form"
+						actionListener="#{closeSalesPage.reportAbuse}"	update="mainpanel" 
+						rendered="#{fn:length(closeSalesPage.lstConfirmedDealProjects) > 0}"/>
+					</span> </span>	
+
+					<p:panel styleClass="simple_panel" rendered="#{fn:length(closeSalesPage.lstConfirmedDealProjects) == 0}">
+						<div class="statusMsg">
+							<h:outputText value="No deals pending for confirmation." />
+						</div>
+					</p:panel>
+					</div>
+				</p:panel>				 
+				</h:form>
+				</div>
+				
+				<p:dialog id="salesDoneDialog" header="Update Sales" 
+					widgetVar="salesDoneDlg" height="506" width="534" dynamic="true">
+					<h:form id="sales_form" >					
+						<p:panel id="updpanel" widgetVar="updwidget" styleClass="simple_panel">
+						<p:message for="updpanel" display="message" />
+						<f:event listener="#{closeSalesPage.validateBuyerCode}" type="postValidate" />
+							<div class="form_panel" style="margin:0px;">
+								<div class="form_title">
+									<h1>Update Sales<br />
+									<span>Sales done</span></h1>
+								</div>
+							
+								<div id="grid_style">
+									<table width="70%" border="0" cellspacing="0" cellpadding="0"
+										class="form_table">
+										<tr>
+											<td class="txtright">Buyer Code</td>
+											<td class="txtright">
+											<table class="simple_table"><tr><td style="width:80%">
+											<p:inputText id="buyercode" styleClass="mandtry"  required="true"
+												label="BuyerCode" value="#{closeSalesPage.buyerCodeForValidation}"
+												validatorMessage="Contains special characters" maxlength="50"
+												binding="#{closeSalesPage.buyerCodeInput}">												
+											</p:inputText></td><td style="width:20%">
+											<p:message for="buyercode" display="icon" />
+											</td></tr></table>
+											</td>
+										</tr>
+										<tr>
+											<td class="txtright">Final Price</td>
+											<td class="txtright">
+												<table class="simple_table"><tr><td style="width:80%">
+												<p:inputText value="#{closeSalesPage.confirmedDealProject.finalPrice}" 
+														id="finalprice" required="true"
+														styleClass="txtnumber mandtry" 
+														validatorMessage="Should be greater than zero and not exceed 10 digits">
+													<f:validateDoubleRange minimum="1" maximum="9999999999.99" />
+													<p:ajax update="sbbuyer,sbadv" listener="#{closeSalesPage.refreshSocialBonus}" event="change" />
+												</p:inputText></td><td style="width:20%">
+												<p:message for="finalprice" display="icon" />
+												</td></tr></table>
+											</td>
+										</tr>
+										<tr>
+											<td class="txtright">Social Bonus - Buyer</td>
+											<td class="txtright">
+												<table class="simple_table"><tr><td style="width:80%">												
+												<p:inputText value="#{closeSalesPage.confirmedDealProject.quote.socialBonusShopper}"  
+														styleClass="txtnumber mandtry"  id="sbbuyer" binding="#{closeSalesPage.sbShopperText}"
+														validatorMessage="Should be greater than or equal to zero and not exceed 10 digits"
+														required="true">
+														<f:validateDoubleRange minimum="0" maximum="9999999999.99" />
+												</p:inputText>
+												</td><td style="width:20%">
+												<p:message for="sbbuyer" display="icon" />
+												</td></tr></table>
+											</td>
+										</tr>
+										<tr>
+											<f:event listener="#{closeSalesPage.validateSocialBonus}" type="postValidate" />
+											<td class="txtright">Social Bonus - Advisor</td>
+											<td class="txtright">
+												<table class="simple_table"><tr><td style="width:80%">
+												<p:inputText id="sbadv"
+													value="#{closeSalesPage.confirmedDealProject.quote.socialBonusAdvisor}"
+													styleClass="txtnumber mandtry" required="true" binding="#{closeSalesPage.sbAdvisorText}"
+													validatorMessage="Should be greater than or equal to zero and not exceed 10 digits">
+													<f:validateDoubleRange minimum="0" maximum="9999999999.99" />
+												</p:inputText>
+												</td><td style="width:20%">
+												<p:message for="sbadv" display="icon" />
+												</td></tr></table>
+											</td>
+										</tr>
+										<tr>
+											<td class="txtright">Brand</td>
+											<td class="txtright">
+												<table class="simple_table"><tr><td style="width:80%">
+												<p:inputText value="#{closeSalesPage.confirmedDealProject.quote.preferredBrand}"
+													styleClass="txtWithSearchIcon" id="brnd"
+													maxlength="50">
+												</p:inputText></td><td style="width:20%">
+												<p:message for="brnd" display="icon" />
+												</td></tr></table>
+											</td>
+										</tr>
+										<tr>
+											<td class="txtright">Model</td>
+											<td class="txtright">
+												<table class="simple_table"><tr><td style="width:80%">
+												<p:inputText value="#{closeSalesPage.confirmedDealProject.quote.preferredModel}"
+													styleClass="txtWithSearchIcon" id="mdel"
+													maxlength="50">
+												</p:inputText></td><td style="width:20%">
+												<p:message for="mdel" display="icon" />
+												</td></tr></table>
+											</td>
+										</tr>
+										<tr>
+											<td class="txtright">Comments</td>
+											<td class="txtright">
+												<p:inputTextarea style="border:1px solid #dadada; padding:5px; width:300px; height:40px;" 
+													value="#{closeSalesPage.confirmedDealProject.quote.comments}" 
+													id="comments" maxlength="200">
+												</p:inputTextarea>
+												<p:message for="comments" display="icon" />
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2" style="text-align:center">
+												<span class="button1"> 
+												<span> 
+													<p:commandButton styleClass="form_button1" id="socialBonusPaidBtn" value="Social Bonus Paid"
+														process="@form" ajax="true" update="@(.ui-panel)" actionListener="#{closeSalesPage.updateSalesBonusPaid}"/> 
+												</span> 
+												</span>
+												<span class="button1"> 
+												<span> 
+													<p:commandButton styleClass="form_button1" id="socialBonusNotPaidBtn" value="Bonus to be paid later"
+														process="@form" ajax="true" update="@(.ui-panel)" actionListener="#{closeSalesPage.updateSalesBonusUnpaid}"/> 
+												</span> 
+												</span>
+												</td>
+										</tr>
+										
+									</table>
+															
+								</div>
+								
+							</div>
+						</p:panel>
+					</h:form>				
+				</p:dialog>
+				<p:dialog id="reportAbuseDialog" header="Report Abuse" 
+					widgetVar="reportAbuseDlg" dynamic="true"
+					width="511" height="436">
+				<h:form id="repAbuseForm">								
+				<p:panel styleClass="simple_panel" id="repAbusePanel">
+				<p:message for="repAbusePanel" display="message" />
+				<f:event listener="#{closeSalesPage.validateSelectedReason}" type="postValidate" />
+				<div class="form_panel" style="margin:0px;">
+				<div class="form_title">
+				<h1>Report Abuse</h1>
+				</div>
+				<br />
+				We apologize for in-convenience. Customer care center will work with you 
+				to ensure your satisfaction - CEO, Help2Decide
+				<br /> <br />
+				Option 1 - Call #{closeSalesPage.tollFree}
+				<br />
+				Option 2 - Submit details below
+				<br /><br />				
+				<div id="grid_style">
+				<p:dataTable id="repAbuseTable" var="repAbuse" 
+							value="#{closeSalesPage.lstReasons}"
+							styleClass="simple_table1">
+					<p:column headerText="">
+						<h:selectBooleanCheckbox id="checkbox" styleClass="checkBox" 
+								value="#{repAbuse.bolSelectedReason}">
+								<p:ajax listener="#{closeSalesPage.updateReasonSelectedFlag}" />
+						</h:selectBooleanCheckbox> 
+					</p:column>
+					
+					<p:column headerText="" style="text-align:left;">
+						<h:outputText value="#{repAbuse.reasonDesc}" /> 
+					</p:column>
+					<f:facet name="footer"> 
+						<p:inputTextarea id="txtcomments" styleClass="textarea3" value="#{closeSalesPage.reportIssue.comments}" binding="#{closeSalesPage.issueComments}"/>
+					</f:facet>
+				  </p:dataTable>
+				<table class="simple_table1">
+				  <tr>
+					<td colspan="2" style="text-align:center">
+						<span class="button1">
+						<span>
+						<p:commandButton styleClass="form_button1" value="Report Abuse" id="insIssueBtn"
+							process="@form"	actionListener="#{closeSalesPage.insertIssue}" 
+							update="@(.ui-panel)" ajax="true"/>
+						</span>
+						</span>
+					</td>
+				</tr>
+				</table>
+				</div>
+				
+				</div>
+				</p:panel>
+				</h:form>
+				</p:dialog>
+				
+				<p:dialog id="contactDialog" header="Contact Shopper" 
+					widgetVar="contactDlg" height="90" width="300" dynamic="true">
+						<h:form id="cont_form" >			
+						<p:panel id="contpanel" widgetVar="contwidget" styleClass="simple_panel">
+						<p:message for="contpanel" display="message" />
+							<div class="form_panel" style="margin:0px;">
+								<div class="form_title">
+									<b>	#{closeSalesPage.confirmedDealProject.userByShopperId.firstName}&nbsp;
+												#{closeSalesPage.confirmedDealProject.userByShopperId.lastName}
+										</b>
+										<br />
+											Email:&nbsp;<a href="mailto:#{closeSalesPage.confirmedDealProject.userByShopperId.emailId}">
+														#{closeSalesPage.confirmedDealProject.userByShopperId.emailId}
+														</a>
+										<br />
+											Ph#:&nbsp;&nbsp;&nbsp;
+												#{closeSalesPage.confirmedDealProject.userByShopperId.contactNumber}			
+								</div>
+								
+							</div>
+						</p:panel>
+					</h:form>				
+				</p:dialog>
+				<div align="center">				
+				<c:choose>
+					<c:when test="#{userBean.user.userStatus.toLowerCase() == 'fully blocked'}">
+					<b style="color:red;">
+					
+						You are blocked from making any further transaction.&nbsp;
+						Please contact the administrator.
+					</b>
+				</c:when>
+				</c:choose>
+				</div>
+			</ui:define>
+
+			<ui:define name="menu">
+				<ui:include src="/templates/menu/menu-all.xhtml" />
+			</ui:define>
+		</ui:composition>
+</h:body>
+</html>
