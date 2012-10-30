@@ -8,6 +8,7 @@ import com.decisionhub.service.controller.UserService;
 import com.decisionhub.web.beans.UserBean;
 
 public class UserHelper {
+int a = 0;
 		
 	/** log user activity **/
 	public static void logUserActivity(UserBean userBean,
@@ -34,4 +35,3 @@ public class UserHelper {
 		userService.insertLoginHistoryAndUpdateUserAttr(user);
 	}
 }
-changed on server.
