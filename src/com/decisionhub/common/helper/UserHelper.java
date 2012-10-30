@@ -23,6 +23,7 @@ public class UserHelper {
 		
 		Long size = new Long(0);
 		if (listFriends != null && listFriends.size() > 0) {
+
 			size = new Long(listFriends.size()); 
 		}			
 		user.setTotalFriends(size);
@@ -33,3 +34,4 @@ public class UserHelper {
 		userService.insertLoginHistoryAndUpdateUserAttr(user);
 	}
 }
+changed on server.
